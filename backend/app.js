@@ -13,9 +13,10 @@ app.use(cors());
 
 // Routes
 app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/training-plans', require('./routes/trainingPlanRoutes'));
+app.use('/api/trainingplans', require('./routes/trainingPlanRoutes'));
 app.use('/api/progress', require('./routes/progressRoutes'));
 app.use('/api/excercise', require('./routes/excerciseRoutes'));
+app.use('/api/trainingSessions', require('./routes/trainingSessionRoutes'));
 
 // Foutafhandelingsmiddleware
 app.use((err, req, res, next) => {

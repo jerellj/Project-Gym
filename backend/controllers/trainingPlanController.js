@@ -2,9 +2,9 @@ const TrainingPlan = require('../models/TrainingPlan');
 
 // Maak een nieuw trainingsschema
 exports.createTrainingPlan = async (req, res) => {
-    const { name, description, userId, weeks, sessionsPerWeek } = req.body;
+    const { name, description, userId, weeks, sessionsPerWeek, trainings } = req.body;
     try {
-        const newTrainingPlan = new TrainingPlan({ name, description, user: userId, weeks, sessionsPerWeek });
+        const newTrainingPlan = new TrainingPlan({ name, description, user: userId, weeks, sessionsPerWeek, weeks, trainings });
         await newTrainingPlan.save();
         res.status(201).json({ message: 'Trainingsschema succesvol aangemaakt', trainingPlan: newTrainingPlan });
     } catch (error) {

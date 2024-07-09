@@ -1,0 +1,45 @@
+{
+  "exercises": [
+    {
+      "exercise": "6687cf2afd7c158cbc3b1153",
+      "sets": 3,
+      "reps": 8,
+      "weight": 50,
+      "reprange": {
+         "start": 8,
+          "end": 12
+      }
+    },
+    {
+      "exercise": "6687cf2cfd7c158cbc3b115d",
+      "sets": 3,
+      "reps": 10,
+      "weight": 40,
+      "reprange": {
+         "start": 8,
+          "end": 12
+      }
+    },
+    {
+      "exercise": "6687cf27fd7c158cbc3b1145",
+      "sets": 3,
+      "reps": 10,
+      "weight": 40,
+      "reprange": {
+         "start": 8,
+          "end": 12
+      }
+    },
+    {
+      "exercise": "6687cf32fd7c158cbc3b1175",
+      "sets": 3,
+      "reps": 10,
+      "weight": 40,
+      "reprange": {
+         "start": 8,
+          "end": 12
+      }
+    }
+  ],
+  "sessionNumber": 1
+}
