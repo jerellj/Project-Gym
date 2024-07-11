@@ -29,7 +29,7 @@ router.post('/login', [
     next();
 }, userController.loginUser);
 
-router.get('/clients', userController.getClients);
+router.get('/', userController.getClients);
 
 router.get('/client',[
     check('email').isEmail().withMessage('Please provide a valid email'),
@@ -41,5 +41,36 @@ router.get('/client',[
     }
     next();
 }, userController.getClient);
+
+// Haal alle gebruikers op
+  
+  // Haal de huidige sessie voor een gebruiker op
+  router.get('/:userId/currentSession', async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const user = await User.findById(userId).populate('trainingPlan');
+      const trainingPlan = user.trainingPlan;
+      const sessions = await TrainingSession.find({ trainingPlan: trainingPlan._id });
+      
+      // Logica om de huidige sessie te bepalen
+      const today = new Date().getDay();
+      const currentSession = sessions[today % sessions.length];
+      
+      res.json(currentSession);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching current session', error });
+    }
+  });
+  
+  // Haal de progressiegegevens voor een gebruiker op
+  router.get('/:userId/progress', async (req, res) => {
+    try {
+      const userId = req.params.userId;
+      const progress = await Progress.find({ user: userId }).populate('exercise');
+      res.json(progress);
+    } catch (error) {
+      res.status(500).json({ message: 'Error fetching progress', error });
+    }
+    });
 
 module.exports = router;
