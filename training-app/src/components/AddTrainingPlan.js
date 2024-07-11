@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+
 const AddTrainingPlan = () => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [weeks, setWeeks] = useState('');
   const [sessionsPerWeek, setSessionsPerWeek] = useState('');
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    axios.post('http://localhost:5001/api/trainingPlans', {
+    axios.post(`${apiBaseUrl}/trainingPlans`, {
       name,
       description,
       weeks: parseInt(weeks),
