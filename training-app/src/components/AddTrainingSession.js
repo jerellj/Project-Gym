@@ -8,18 +8,21 @@ const AddTrainingSession = () => {
   const [exercises, setExercises] = useState([]);
   const [exerciseList, setExerciseList] = useState([{ exerciseId: '', sets: '', start: '', end: '', weight: '' }]);
   const [sessionNumber, setSessionNumber] = useState('');
+  const [name, setName] = useState('');
+
+  const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
     // Haal de lijst van oefeningen op vanuit de API
-    axios.get('http://127.0.0.1:5001/api/Excercise/excercises')
+    axios.get(`${apiBaseUrl}/exercises`)
       .then(response => setExercises(response.data))
       .catch(error => console.error('Error fetching exercises:', error));
     
     // Haal de lijst van trainingsplannen op vanuit de API
-    axios.get('http://127.0.0.1:5001/api/trainingPlans')
+    axios.get(`${apiBaseUrl}/trainingPlans`)
       .then(response => setTrainingPlans(response.data))
       .catch(error => console.error('Error fetching training plans:', error));
-  }, []);
+  }, [apiBaseUrl]);
 
   const handleTrainingPlanChange = (e) => {
     const value = e.target.value;
@@ -43,21 +46,32 @@ const AddTrainingSession = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // Log de exerciseList om te controleren of de velden correct zijn ingevuld
+    console.log('Exercise List:', exerciseList);
+
     const exercisesData = exerciseList.map(exercise => ({
       exercise: exercise.exerciseId,
       sets: parseInt(exercise.sets),
-      repRange: { start: parseInt(exercise.start), end: parseInt(exercise.end) },
+      reprange: { start: parseInt(exercise.start), end: parseInt(exercise.end) },
       weight: parseInt(exercise.weight)
     }));
-    axios.post('http://127.0.0.1:5001/api/trainingSessions', {
+
+    // Log de data die naar de server wordt verzonden
+    console.log('Exercises Data:', exercisesData);
+
+    axios.post(`${apiBaseUrl}/trainingSessions`, {
+      name: name,
       trainingPlanId: trainingPlanId || newTrainingPlanId,
       exercises: exercisesData,
       sessionNumber: parseInt(sessionNumber)
     })
-      .then(response => {
-        console.log('Training session created:', response.data);
-      })
-      .catch(error => console.error('Error creating training session:', error));
+    .then(response => {
+      console.log('Training session created:', response.data);
+    })
+    .catch(error => {
+      console.error('Error creating training session:', error.response ? error.response.data : error.message);
+    });
   }
 
   return (
@@ -65,8 +79,18 @@ const AddTrainingSession = () => {
       <h1>Add Training Session</h1>
       <form onSubmit={handleSubmit}>
         <div>
+          <label>Name:</label>
+          <input 
+            type="text" 
+            value={name} 
+            onChange={(e) => setName(e.target.value)} 
+            placeholder="Enter session name" 
+            required
+          />
+        </div>
+        <div>
           <label>Training Plan ID:</label>
-          <select value={trainingPlanId} onChange={handleTrainingPlanChange}>
+          <select value={trainingPlanId} onChange={handleTrainingPlanChange} required>
             <option value="">Select Existing Training Plan</option>
             {trainingPlans.map(plan => (
               <option key={plan._id} value={plan._id}>{plan.name}</option>

@@ -18,13 +18,13 @@ const SearchExercises = () => {
     axios.get(`${apiBaseUrl}/Excercise/excercises`)
       .then(response => {
         console.log('Fetched exercises:', response.data); // Debugging line
-        setExercises(response.data);
+        setExercises(response.data); 
       })
-      .catch(error => console.error('Error fetching exercises:', error));
-  }, [apiBaseUrl]); // Correctie: 'apiBaseUrl' toegevoegd aan de afhankelijkheidsarray
+      .catch(error => console.error('Error fetching exercises:', error)); // Debugging line
+  }, [apiBaseUrl]);
 
   const handleSearch = useCallback(() => {
-    let results = exercises;
+    let results = exercises; 
 
     if (searchName.length >= 3) {
       results = results.filter(exercise => exercise.name.toLowerCase().includes(searchName.toLowerCase()));
@@ -94,13 +94,6 @@ const SearchExercises = () => {
           <option value="traps">Traps</option>
         </select>
       </div>
-      <ul>
-        {filteredExercises.map(exercise => (
-          <li key={exercise._id} onClick={() => setSelectedExercise(exercise)}>
-            {exercise.name}
-          </li>
-        ))}
-      </ul>
       {selectedExercise && (
         <div>
           <h2>Exercise Details</h2>
@@ -115,7 +108,14 @@ const SearchExercises = () => {
             ))}
           </ul>
         </div>
-      )}
+      )}      
+      <ul>
+        {filteredExercises.map(exercise => (
+          <li key={exercise._id} onClick={() => setSelectedExercise(exercise)}>
+            {exercise.name}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

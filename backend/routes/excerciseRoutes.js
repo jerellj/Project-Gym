@@ -35,6 +35,8 @@ router.post('/update', validateExcercise, (req, res, next) => {
 
 router.get('/excercises', exercisesController.getExcercises);
 
+router.get('/', exercisesController.getExcercises);
+
 router.get('/CardioExcercises', exercisesController.getCardioExcercises);
 
 router.get('/StrengthExcercises', exercisesController.getStrengthExcercises);

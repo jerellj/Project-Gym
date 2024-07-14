@@ -6,7 +6,7 @@ const trainingSessionSchema = new mongoose.Schema({
     exercises: [{  // Array met oefeningen
         exercise: { type: mongoose.Schema.Types.ObjectId, ref: 'Exercise' },
         sets: { type: Number, required: true },
-        reps: { type: Number, required: true },
+        reps: { type: Number},
         weight: { type: Number },
         reprange: { // Herhalingen bereik
             start: { type: Number, required: true },
