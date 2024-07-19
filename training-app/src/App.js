@@ -5,6 +5,8 @@ import AddTrainingPlan from './components/AddTrainingPlan';
 import AddTrainingSession from './components/AddTrainingSession';
 import SearchExercises from './components/SearchExercises';
 import TrackProgress from './components/TrackProgress';
+import ListTrainingSession from './components/ShowTrainingSessions';
+
 
 function App() {
   return (
@@ -17,6 +19,7 @@ function App() {
             <li><Link to="/add-training-plan">Add Training Plan</Link></li>
             <li><Link to="/add-training-session">Add Training Session</Link></li>
             <li><Link to="/track-progress">Track Progress</Link></li>
+            <li><Link to="/list-trainingsessions">List Sessions</Link></li>
           </ul>
         </nav>
         <Routes>
@@ -25,6 +28,7 @@ function App() {
           <Route path="/add-training-plan" element={<AddTrainingPlan />} />
           <Route path="/add-training-session" element={<AddTrainingSession />} />
           <Route path="/track-progress" element={<TrackProgress />} />
+          <Route path="/list-trainingsessions" element={<ListTrainingSession />} />
         </Routes>
       </div>
     </Router>

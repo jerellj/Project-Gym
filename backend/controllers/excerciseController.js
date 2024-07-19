@@ -1,6 +1,7 @@
 const { name } = require('../app');
 const consExcercise = require('../models/Excercise');
 const logger = require('../logger');
+const mongoose = require('mongoose');
 
 exports.getExcercises = async (req, res) => {
     try {
@@ -87,6 +88,19 @@ exports.getExcercise = async (req, res) => {
     try {
         const excercise = await consExcercise.findOne({name}); // Selecteer alle klanten en sluit het wachtwoord uit
         logger.info(`Getting excercise with name: ${name}`); // Log inlogpoging
+        res.status(200).json(excercise);
+    } catch (error) {
+        logger.error('Error getting excersise:', error);
+        res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de oefening', error });
+    }
+};
+
+exports.getExcerciseName = async (req, res) => {
+    const { id } = req.query;
+    try {
+        const objectId = new mongoose.Types.ObjectId(id);
+        const excercise = await consExcercise.findOne({_id: objectId }); // Selecteer alle klanten en sluit het wachtwoord uit
+        logger.info(`Getting excercise with name: ${id}`); // Log inlogpoging
         res.status(200).json(excercise);
     } catch (error) {
         logger.error('Error getting excersise:', error);

@@ -2,6 +2,16 @@ const TrainingSession = require('../models/TrainingSession');
 const TrainingPlan = require('../models/TrainingPlan');
 const Progress = require('../models/Progress');
 
+// Haal alle trainingsschema's op
+exports.getTrainingSession = async (req, res) => {
+    try {
+        const trainingPlans = await TrainingSession.find().populate('exercises.exercise');
+        res.status(200).json(trainingPlans);
+    } catch (error) {
+        res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de trainingsschema\'s', error });
+    }
+};
+
 exports.addTrainingSession = async (req, res) => {
     const { name, trainingPlanId, exercises, sessionNumber } = req.body;
     try {
