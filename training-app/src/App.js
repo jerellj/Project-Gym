@@ -6,6 +6,7 @@ import AddTrainingSession from './components/AddTrainingSession';
 import SearchExercises from './components/SearchExercises';
 import TrackProgress from './components/TrackProgress';
 import ListTrainingSession from './components/ShowTrainingSessions';
+import TrainingSessionDetails from './components/TrainingSessionDetails';
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/add-training-session" element={<AddTrainingSession />} />
           <Route path="/track-progress" element={<TrackProgress />} />
           <Route path="/list-trainingsessions" element={<ListTrainingSession />} />
+          <Route path="/trainingSessions/:id" element={<TrainingSessionDetails />} />
         </Routes>
       </div>
     </Router>

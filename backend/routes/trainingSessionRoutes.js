@@ -5,8 +5,12 @@ const trainingSessionController = require('../controllers/trainingSesionControll
 // Route voor het ophalen van de volgende trainingssessie
 router.get('/next/:trainingPlanId/:userId', trainingSessionController.getNextTrainingSession);
 
-router.get('/', trainingSessionController.getTrainingSession);
+router.get('/:trainingSessionId', trainingSessionController.getTrainingSession);
+
+router.get('/', trainingSessionController.getTrainingSessions);
 
 router.post('/', trainingSessionController.addTrainingSession);
 
 module.exports = router;
+
+//trainingSessionId

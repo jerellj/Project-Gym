@@ -15,7 +15,7 @@ exports.createTrainingPlan = async (req, res) => {
 // Haal alle trainingsschema's op
 exports.getTrainingPlans = async (req, res) => {
     try {
-        const trainingPlans = await TrainingPlan.find();
+        const trainingPlans = await TrainingPlan.find().populate('trainings');
         res.status(200).json(trainingPlans);
     } catch (error) {
         res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de trainingsschema\'s', error });

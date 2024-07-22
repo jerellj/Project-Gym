@@ -3,7 +3,7 @@ const TrainingPlan = require('../models/TrainingPlan');
 const Progress = require('../models/Progress');
 
 // Haal alle trainingsschema's op
-exports.getTrainingSession = async (req, res) => {
+exports.getTrainingSessions = async (req, res) => {
     try {
         const trainingPlans = await TrainingSession.find().populate('exercises.exercise');
         res.status(200).json(trainingPlans);
@@ -23,6 +23,19 @@ exports.addTrainingSession = async (req, res) => {
         res.status(201).json({ message: 'TrainingSession succesvol toegevoegd', trainingSession: newTrainingSession });
     } catch (error) {
         res.status(500).json({ message: 'Er is iets misgegaan bij het toevoegen van de TrainingSession', error });
+    }
+};
+
+exports.getTrainingSession = async (req, res) => {
+    const { trainingSessionId } = req.params;
+    try {
+        const trainingSession = await TrainingSession.findById(trainingSessionId).populate('exercises.exercise');
+        if (!trainingSession) {
+            return res.status(404).json({ message: 'TrainingSession niet gevonden' });
+        }
+        res.status(200).json(trainingSession);
+    } catch (error) {
+        res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de TrainingSession', error });
     }
 };
 
