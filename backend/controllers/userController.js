@@ -108,3 +108,21 @@ exports.addTrainingPlanToUser = async (req, res) => {
         res.status(500).json({ message: 'Er is iets misgegaan bij het toevoegen van het trainingsplan aan de gebruiker', error });
     }
 };
+
+exports.getUsersWithTrainingPlans = async (req, res) => {
+    try {
+        const clients = await User.find({ role: 'klant', trainingPlans: { $exists: true, $not: { $size: 0 } } })
+            .select('-password')
+            .populate({
+                path: 'trainingPlans',
+                populate: {
+                    path: 'trainings',
+                    model: 'TrainingSession'
+                }
+            });
+        res.status(200).json(clients);
+    } catch (error) {
+        logger.error('Error getting clients:', error);
+        res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de klanten', error });
+    }
+};

@@ -76,4 +76,6 @@ router.get('/client',[
   // Voeg een trainingsplan toe aan een gebruiker
   router.post('/addTrainingPlan', userController.addTrainingPlanToUser);
 
+  router.get('/with-training-plans', userController.getUsersWithTrainingPlans);
+
 module.exports = router;

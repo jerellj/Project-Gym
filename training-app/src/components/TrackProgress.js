@@ -6,7 +6,7 @@ const ProgressView = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedTrainingPlan, setSelectedTrainingPlan] = useState(null);
   const [selectedTrainingSession, setSelectedTrainingSession] = useState(null);
-  const [progress, setProgress] = useState([]);
+  const [progress, setProgress] = useState(null); // Change to hold single progress object
   const [newProgress, setNewProgress] = useState({});
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -18,13 +18,13 @@ const ProgressView = () => {
   }, [apiBaseUrl]);
 
   useEffect(() => {
-    if (selectedUser) {
-      // Haal de voortgang op voor de geselecteerde gebruiker
-      axios.get(`${apiBaseUrl}/progress/${selectedUser._id}`)
-        .then(response => setProgress(response.data))
+    if (selectedUser && selectedTrainingSession) {
+      // Haal de voortgang op voor de geselecteerde gebruiker en sessie
+      axios.get(`${apiBaseUrl}/progress/session/${selectedUser._id}/${selectedTrainingSession._id}`)
+        .then(response => setProgress(response.data)) // Set single progress object
         .catch(error => console.error('Error fetching progress:', error));
     }
-  }, [selectedUser, apiBaseUrl]);
+  }, [selectedUser, selectedTrainingSession, apiBaseUrl]);
 
   const handleProgressChange = (exerciseId, setIndex, field, value) => {
     const updatedProgress = { ...newProgress };
@@ -39,14 +39,13 @@ const ProgressView = () => {
   };
 
   const handleSubmit = () => {
-    const exercises = Object.keys(newProgress).map(exerciseId => {
-      return newProgress[exerciseId].map(set => ({
-        exerciseId,
-        sets: set.sets,
+    const exercises = Object.keys(newProgress).map(exerciseId => ({
+      exercise: exerciseId,
+      sets: newProgress[exerciseId].map(set => ({
         reps: set.reps,
         weight: set.weight
-      }));
-    }).flat();
+      }))
+    }));
 
     console.log('Submitting progress:', exercises);
 
@@ -58,7 +57,7 @@ const ProgressView = () => {
     })
       .then(response => {
         console.log('Progress added:', response.data);
-        setProgress([...progress, response.data.progress]);
+        setProgress(response.data.progress); // Set the latest progress
       })
       .catch(error => console.error('Error adding progress:', error));
   };
@@ -152,21 +151,24 @@ const ProgressView = () => {
             ))}
           </ul>
           <button onClick={handleSubmit}>Save Progress</button>
-          <h2>Previous Progress</h2>
-          <ul>
-            {progress.map((entry, index) => (
-              <li key={index}>
-                <p>Date: {new Date(entry.date).toLocaleDateString()}</p>
-                {entry.exercises.map((exercise, i) => (
+          <h2>Latest Progress</h2>
+          {progress && (
+            <ul>
+              <li>
+                <p>Date: {new Date(progress.date).toLocaleDateString()}</p>
+                {progress.exerciseProgress && Array.isArray(progress.exerciseProgress) && progress.exerciseProgress.map((exercise, i) => (
                   <div key={i}>
-                    <p>Exercise: {exercise.exerciseId}</p>
-                    <p>Weight: {exercise.weight}</p>
-                    <p>Reps: {exercise.reps}</p>
+                    <p>Exercise: {exercise.exercise.name}</p>
+                    {exercise.sets.map((set, setIndex) => (
+                      <div key={setIndex}>
+                        <p>Set {setIndex + 1}: {set.reps} reps at {set.weight} kg</p>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </li>
-            ))}
-          </ul>
+            </ul>
+          )}
         </div>
       )}
     </div>
