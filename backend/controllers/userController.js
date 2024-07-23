@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const TrainingPlan  = require('../models/TrainingPlan');
 const logger = require('../logger'); // Zorg ervoor dat je een logger gebruikt
 
 const generateToken = (user) => {
@@ -50,10 +51,21 @@ exports.loginUser = async (req, res) => {
         res.status(500).json({ message: 'Er is iets misgegaan bij het inloggen', error });
     }
 };
-
-exports.getClients = async (req, res) => {
+exports.getUsers = async (req, res) => {
     try {
-        const clients = await User.find({ role: 'klant' }).select('-password'); // Selecteer alle klanten en sluit het wachtwoord uit
+        const clients = await User.find({ role: 'klant' })
+            .select('-password')
+            .populate({
+                path: 'trainingPlans',
+                populate: {
+                    path: 'trainings',
+                    model: 'TrainingSession',
+                    populate: {
+                        path: 'exercises.exercise',
+                        model: 'Exercise'
+                    }
+                }
+            });
         res.status(200).json(clients);
     } catch (error) {
         logger.error('Error getting clients:', error);
@@ -61,14 +73,38 @@ exports.getClients = async (req, res) => {
     }
 };
 
-exports.getClient = async (req, res) => {
+exports.getUser = async (req, res) => {
     const { email } = req.query;
     try {
-        const client = await User.findOne({ email, role: "klant" }).select('-password'); // Selecteer alle klanten en sluit het wachtwoord uit
+        const client = await User.findOne({ email, role: "klant" }).select('-password').populate('trainingPlans'); // Selecteer alle klanten en sluit het wachtwoord uit
         logger.info(`Getting client with email: ${email}`); // Log inlogpoging
         res.status(200).json(client);
     } catch (error) {
         logger.error('Error getting clients:', error);
         res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de klanten', error });
+    }
+};
+
+// Voeg een trainingsplan toe aan een gebruiker
+exports.addTrainingPlanToUser = async (req, res) => {
+    const { userId, trainingPlanId } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: 'Gebruiker niet gevonden' });
+        }
+
+        const trainingPlan = await TrainingPlan.findById(trainingPlanId);
+        if (!trainingPlan) {
+            return res.status(404).json({ message: 'Trainingsplan niet gevonden' });
+        }
+
+        user.trainingPlans.push(trainingPlanId);
+        await user.save();
+
+        res.status(200).json({ message: 'Trainingsplan succesvol toegevoegd aan gebruiker', user });
+    } catch (error) {
+        res.status(500).json({ message: 'Er is iets misgegaan bij het toevoegen van het trainingsplan aan de gebruiker', error });
     }
 };

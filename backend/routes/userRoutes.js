@@ -29,7 +29,7 @@ router.post('/login', [
     next();
 }, userController.loginUser);
 
-router.get('/', userController.getClients);
+router.get('/', userController.getUsers);
 
 router.get('/client',[
     check('email').isEmail().withMessage('Please provide a valid email'),
@@ -40,7 +40,7 @@ router.get('/client',[
         return res.status(400).json({ errors: errors.array() });
     }
     next();
-}, userController.getClient);
+}, userController.getUser);
 
 // Haal alle gebruikers op
   
@@ -72,5 +72,8 @@ router.get('/client',[
       res.status(500).json({ message: 'Error fetching progress', error });
     }
     });
+
+  // Voeg een trainingsplan toe aan een gebruiker
+  router.post('/addTrainingPlan', userController.addTrainingPlanToUser);
 
 module.exports = router;

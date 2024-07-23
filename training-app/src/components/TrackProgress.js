@@ -3,7 +3,6 @@ import axios from 'axios';
 
 const ProgressView = () => {
   const [users, setUsers] = useState([]);
-  const [trainingPlans, setTrainingPlans] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedTrainingPlan, setSelectedTrainingPlan] = useState(null);
   const [selectedTrainingSession, setSelectedTrainingSession] = useState(null);
@@ -17,15 +16,6 @@ const ProgressView = () => {
       .then(response => setUsers(response.data))
       .catch(error => console.error('Error fetching users:', error));
   }, [apiBaseUrl]);
-
-  useEffect(() => {
-    if (selectedUser) {
-      // Haal de trainingsplannen op voor de geselecteerde gebruiker
-      axios.get(`${apiBaseUrl}/trainingPlans/${selectedUser._id}`)
-        .then(response => setTrainingPlans(response.data))
-        .catch(error => console.error('Error fetching training plans:', error));
-    }
-  }, [selectedUser, apiBaseUrl]);
 
   useEffect(() => {
     if (selectedUser) {
@@ -58,10 +48,12 @@ const ProgressView = () => {
       }));
     }).flat();
 
+    console.log('Submitting progress:', exercises);
+
     axios.post(`${apiBaseUrl}/progress`, {
-      userId: selectedUser._id,
-      trainingPlanId: selectedTrainingPlan._id,
-      exercises,
+      user: selectedUser._id,
+      trainingSession: selectedTrainingSession._id,
+      exerciseProgress: exercises,
       date: new Date()
     })
       .then(response => {
@@ -71,12 +63,36 @@ const ProgressView = () => {
       .catch(error => console.error('Error adding progress:', error));
   };
 
+  const handleUserChange = (e) => {
+    const userId = e.target.value;
+    if (!userId) return;
+    const user = users.find(u => u._id === userId);
+    setSelectedUser(user);
+    if (user.trainingPlans.length > 0) {
+      setSelectedTrainingPlan(user.trainingPlans[0]);
+    } else {
+      setSelectedTrainingPlan(null);
+    }
+  };
+
+  const handleTrainingPlanChange = (e) => {
+    const trainingPlanId = e.target.value;
+    const trainingPlan = selectedUser.trainingPlans.find(plan => plan._id === trainingPlanId);
+    setSelectedTrainingPlan(trainingPlan);
+  };
+
+  const handleTrainingSessionChange = (e) => {
+    const sessionId = e.target.value;
+    const trainingSession = selectedTrainingPlan.trainings.find(session => session._id === sessionId);
+    setSelectedTrainingSession(trainingSession);
+  };
+
   return (
     <div>
       <h1>Track Progress</h1>
       <div>
         <label>Select User:</label>
-        <select onChange={(e) => setSelectedUser(users.find(user => user._id === e.target.value))}>
+        <select onChange={handleUserChange}>
           <option value="">Select a user</option>
           {users.map(user => (
             <option key={user._id} value={user._id}>{user.name}</option>
@@ -86,9 +102,9 @@ const ProgressView = () => {
       {selectedUser && (
         <div>
           <label>Select Training Plan:</label>
-          <select onChange={(e) => setSelectedTrainingPlan(trainingPlans.find(plan => plan._id === e.target.value))}>
+          <select onChange={handleTrainingPlanChange}>
             <option value="">Select a training plan</option>
-            {trainingPlans.map(plan => (
+            {selectedUser.trainingPlans.map(plan => (
               <option key={plan._id} value={plan._id}>{plan.name}</option>
             ))}
           </select>
@@ -97,7 +113,7 @@ const ProgressView = () => {
       {selectedTrainingPlan && (
         <div>
           <label>Select Training Session:</label>
-          <select onChange={(e) => setSelectedTrainingSession(selectedTrainingPlan.trainings.find(session => session._id === e.target.value))}>
+          <select onChange={handleTrainingSessionChange}>
             <option value="">Select a training session</option>
             {selectedTrainingPlan.trainings.map(session => (
               <option key={session._id} value={session._id}>{session.name}</option>

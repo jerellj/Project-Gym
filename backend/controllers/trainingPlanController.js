@@ -21,3 +21,13 @@ exports.getTrainingPlans = async (req, res) => {
         res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de trainingsschema\'s', error });
     }
 };
+
+exports.getTrainingPlan = async (req, res) => {
+    const { trainingPlanId } = req.params;
+    try {
+        const trainingPlans = await TrainingPlan.findById(trainingPlanId).populate('trainings');
+        res.status(200).json(trainingPlans);
+    } catch (error) {
+        res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de trainingsschema\'s', error });
+    }
+};

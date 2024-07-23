@@ -2,9 +2,9 @@ const Progress = require('../models/Progress');
 
 // Voeg voortgang toe
 exports.addProgress = async (req, res) => {
-    const { userId, trainingPlanId, exercises, date } = req.body;
+    const { user, trainingSession, exerciseProgress, date } = req.body;
     try {
-        const newProgress = new Progress({ userId, trainingPlanId, exercises, date });
+        const newProgress = new Progress({ user, trainingSession, exerciseProgress, date });
         await newProgress.save();
         res.status(201).json({ message: 'Voortgang succesvol toegevoegd', progress: newProgress });
     } catch (error) {

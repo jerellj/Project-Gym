@@ -7,5 +7,7 @@ router.post('/', trainingPlanController.createTrainingPlan);
 
 // Haal alle trainingsschema's op
 router.get('/', trainingPlanController.getTrainingPlans);
+// Haal alle trainingsschema's op
+router.get('/plans/:trainingPlanId', trainingPlanController.getTrainingPlans);
 
 module.exports = router;

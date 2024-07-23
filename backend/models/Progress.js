@@ -6,7 +6,7 @@ const ProgressSchema = new mongoose.Schema({
     date: { type: Date, default: Date.now },
     exerciseProgress: [{
         exercise: { type: mongoose.Schema.Types.ObjectId, ref: 'Exercise' },
-        sets: { type: Number, required: true },
+        sets: { type: Number, required: false },
         reps: { type: Number, required: true },
         weight: { type: Number }
     }]
