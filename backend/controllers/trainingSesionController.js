@@ -43,19 +43,36 @@ exports.getNextTrainingSession = async (req, res) => {
     const { userId, trainingPlanId } = req.params;
     try {
         // Haal het trainingsplan op en populate de trainingssessies
-        const trainingPlan = await TrainingPlan.findById(trainingPlanId).populate('trainings');
+        const trainingPlan = await TrainingPlan.findById(trainingPlanId).populate({
+            path: 'trainings',
+            populate: {
+                path: 'exercises.exercise',
+                model: 'Exercise'
+            }
+        });
         if (!trainingPlan) {
             return res.status(404).json({ message: 'TrainingPlan niet gevonden' });
         }
 
-        // Haal de voortgang van de gebruiker op
-        const userProgress = await Progress.find({ user: userId, trainingSession: { $in: trainingPlan.trainings } }).populate('trainingSession');
+        // Haal de laatste voortgang van de gebruiker op
+        const lastProgress = await Progress.findOne({ user: userId })
+            .sort({ date: -1 }) // Sorteer op datum in aflopende volgorde
+            .limit(1) // Limiteer het resultaat tot 1 document
+            .populate('trainingSession');
 
-        // Bepaal de laatste voltooide sessie
-        const lastCompletedSession = userProgress.length > 0 ? userProgress[userProgress.length - 1].trainingSession.sessionNumber : 0;
+        let nextSessionNumber;
+        if (lastProgress && lastProgress.trainingSession) {
+            // Bepaal het nummer van de volgende sessie
+            nextSessionNumber = (lastProgress.trainingSession.sessionNumber % trainingPlan.trainings.length) + 1;
+        } else {
+            nextSessionNumber = 1; // Start bij sessie 1 als er geen voortgang is
+        }
 
-        // Bepaal het nummer van de volgende sessie
-        const nextSessionNumber = (lastCompletedSession % trainingPlan.trainings.length) + 1;
+        // Controleer of het sessienummer groter is dan het hoogste sessienummer in het plan
+        const highestSessionNumber = Math.max(...trainingPlan.trainings.map(session => session.sessionNumber));
+        if (nextSessionNumber > highestSessionNumber) {
+            nextSessionNumber = 1;
+        }
 
         // Vind de volgende sessie op basis van het sessienummer
         const nextSession = trainingPlan.trainings.find(session => session.sessionNumber === nextSessionNumber);

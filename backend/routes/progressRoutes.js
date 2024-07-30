@@ -8,6 +8,9 @@ router.post('/', progressController.addProgress);
 // Haal voortgang op voor een gebruiker
 router.get('/:userId', progressController.getUserProgress);
 
+// Haal voortgang op voor een gebruiker
+router.get('/last/:userId', progressController.getUserLastProgress);
+
 // Haal voortgang op voor een specifieke sessie
 router.get('/session/:userId/:sessionId', progressController.getUserSessionProgress);
 

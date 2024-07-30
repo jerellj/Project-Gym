@@ -32,6 +32,19 @@ exports.getUserProgress = async (req, res) => {
         res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de voortgang', error });
     }
 };
+//Haalt alleen de laatste voortgang op voor een gebruiker
+exports.getUserLastProgress = async (req, res) => {
+    const { userId } = req.params;
+    try {
+        const progress = await Progress.find({ user: userId })
+            .sort({ date: -1 }) // Sorteer op datum in aflopende volgorde
+            .limit(1) // Limiteer het resultaat tot 1 document
+            .populate('exerciseProgress.exercise');
+        res.status(200).json(progress[0]); // Stuur het eerste (en enige) document terug
+    } catch (error) {
+        res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de voortgang', error });
+    }
+};
 
 // Haal de voortgang op voor een specifieke gebruiker en sessie
 exports.getUserSessionProgress = async (req, res) => {
@@ -39,7 +52,10 @@ exports.getUserSessionProgress = async (req, res) => {
     try {
         const progress = await Progress.findOne({ user: userId, trainingSession: sessionId })
             .sort({ date: -1 }) // Sorteer op datum in aflopende volgorde
-            .populate('exerciseProgress.exercise');
+            .populate({
+                path: 'exerciseProgress.exercise',
+                model: 'Exercise'
+            });
         res.status(200).json(progress);
     } catch (error) {
         res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de voortgang', error });

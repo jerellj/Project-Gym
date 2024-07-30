@@ -7,7 +7,6 @@ import SearchExercises from './components/SearchExercises';
 import TrackProgress from './components/TrackProgress';
 import ListTrainingSession from './components/ShowTrainingSessions';
 import TrainingSessionDetails from './components/TrainingSessionDetails';
-import UserList from './components/UserList';
 
 
 function App() {
@@ -16,8 +15,7 @@ function App() {
       <div className="App">
         <nav>
           <ul>
-            <li><Link to="/">Users</Link></li>
-            <li><Link to="/Search-Exercises">Search Exercises</Link></li>
+            <li><Link to="/">Search Exercises</Link></li>
             <li><Link to="/training-Plans">Training Plans</Link></li>
             <li><Link to="/add-training-plan">Add Training Plan</Link></li>
             <li><Link to="/add-training-session">Add Training Session</Link></li>
@@ -26,8 +24,7 @@ function App() {
           </ul>
         </nav>
         <Routes>
-          <Route path="/" element={<UserList />} />
-          <Route path="/Search-Exercises" element={<SearchExercises />} />
+          <Route path="/" element={<SearchExercises />} />
           <Route path="/training-plans" element={<TrainingPlans />} />
           <Route path="/add-training-plan" element={<AddTrainingPlan />} />
           <Route path="/add-training-session" element={<AddTrainingSession />} />
