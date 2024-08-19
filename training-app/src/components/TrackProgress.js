@@ -85,11 +85,11 @@ const ProgressView = () => {
   };
 
   return (
-    <div>
-      <h1>Track Progress</h1>
-      <div>
-        <label>Select User:</label>
-        <select onChange={handleUserChange}>
+    <div className="w3-container w3-padding-32">
+      <h1 className="w3-center w3-text-teal">Track Progress</h1>
+      <div className="w3-margin-bottom">
+        <label className="w3-text-teal"><strong>Select User:</strong></label>
+        <select className="w3-select" onChange={handleUserChange}>
           <option value="">Select a user</option>
           {users.map(user => (
             <option key={user._id} value={user._id}>{user.name}</option>
@@ -97,9 +97,9 @@ const ProgressView = () => {
         </select>
       </div>
       {selectedTrainingPlan && (
-        <div>
-          <label>Select Training Session:</label>
-          <select onChange={handleTrainingSessionChange} value={selectedTrainingSession ? selectedTrainingSession._id : ''}>
+        <div className="w3-margin-bottom">
+          <label className="w3-text-teal"><strong>Select Training Session:</strong></label>
+          <select className="w3-select" onChange={handleTrainingSessionChange} value={selectedTrainingSession ? selectedTrainingSession._id : ''}>
             <option value="">Select a training session</option>
             {selectedTrainingPlan.trainings.map(session => (
               <option key={session._id} value={session._id}>{session.name}</option>
@@ -108,23 +108,25 @@ const ProgressView = () => {
         </div>
       )}
       {selectedTrainingSession && selectedTrainingSession.exercises && (
-        <div>
-          <h2><strong>Session name:</strong> {selectedTrainingSession.name}</h2>
-          <ul>
+        <div className="w3-card-4 w3-padding w3-margin-top">
+          <h2 className="w3-center w3-text-teal"><strong>Session name:</strong> {selectedTrainingSession.name}</h2>
+          <ul className="w3-ul">
             {selectedTrainingSession.exercises.map((exerciseDetail, index) => (
-              <li key={index}>
+              <li key={index} className="w3-padding-16">
                 <div>
-                  <h3>{exerciseDetail.exercise.name}</h3>
+                  <h3 className="w3-text-teal">{exerciseDetail.exercise.name}</h3>
                   <p>Sets: {exerciseDetail.sets}</p>
                   {[...Array(exerciseDetail.sets)].map((_, setIndex) => (
-                    <div key={setIndex} className="set">
+                    <div key={setIndex} className="w3-margin-bottom">
                       <input
+                        className="w3-input w3-border w3-margin-bottom"
                         type="number"
                         placeholder="Weight"
                         value={newProgress[exerciseDetail.exercise._id]?.[setIndex]?.weight || ''}
                         onChange={(e) => handleProgressChange(exerciseDetail.exercise._id, setIndex, 'weight', e.target.value)}
                       />
                       <input
+                        className="w3-input w3-border"
                         type="number"
                         placeholder="Reps"
                         value={newProgress[exerciseDetail.exercise._id]?.[setIndex]?.reps || ''}
@@ -136,14 +138,14 @@ const ProgressView = () => {
               </li>
             ))}
           </ul>
-          <button onClick={handleSubmit}>Save Progress</button>
-          <h2>Latest Progress</h2>
+          <button className="w3-button w3-teal w3-margin-top" onClick={handleSubmit}>Save Progress</button>
+          <h2 className="w3-text-teal w3-margin-top">Latest Progress</h2>
           {progress ? (
-            <ul>
-              <li>
+            <ul className="w3-ul w3-border">
+              <li className="w3-padding-16">
                 <p>Date: {new Date(progress.date).toLocaleDateString()}</p>
                 {progress.exerciseProgress && Array.isArray(progress.exerciseProgress) && progress.exerciseProgress.map((exercise, i) => (
-                  <div key={i}>
+                  <div key={i} className="w3-margin-bottom">
                     <p>Exercise: {exercise.exercise.name}</p>
                     {exercise.sets.map((set, setIndex) => (
                       <div key={setIndex}>
@@ -155,7 +157,7 @@ const ProgressView = () => {
               </li>
             </ul>
           ) : (
-            <p>Nog geen eerdere progressie</p>
+            <p className="w3-text-teal">Nog geen eerdere progressie</p>
           )}
         </div>
       )}

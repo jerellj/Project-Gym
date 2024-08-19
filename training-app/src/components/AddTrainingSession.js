@@ -14,7 +14,7 @@ const AddTrainingSession = () => {
 
   useEffect(() => {
     // Haal de lijst van oefeningen op vanuit de API
-    axios.get(`${apiBaseUrl}/exercises`)
+    axios.get(`${apiBaseUrl}/exercise`)
       .then(response => setExercises(response.data))
       .catch(error => console.error('Error fetching exercises:', error));
     
