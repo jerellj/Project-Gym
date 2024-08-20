@@ -15,9 +15,20 @@ exports.getTrainingSessions = async (req, res) => {
 exports.addTrainingSession = async (req, res) => {
     const { name, trainingPlanId, exercises, sessionNumber } = req.body;
     try {
+        // Validatie: Controleer of de start reprange lager of gelijk is aan de end reprange
+        for (const exercise of exercises) {
+            if (exercise.reprange.start > exercise.reprange.end) {
+                return res.status(400).json({
+                    message: `Ongeldige reprange voor oefening ${exercise.exercise}: Start moet lager of gelijk zijn aan eind.`
+                });
+            }
+        }
+
+        // Maak een nieuwe TrainingSession aan
         const newTrainingSession = new TrainingSession({ name, exercises, sessionNumber });
         await newTrainingSession.save();
 
+        // Voeg de nieuwe TrainingSession toe aan het training plan
         await TrainingPlan.findByIdAndUpdate(trainingPlanId, { $push: { trainings: newTrainingSession._id } });
 
         res.status(201).json({ message: 'TrainingSession succesvol toegevoegd', trainingSession: newTrainingSession });

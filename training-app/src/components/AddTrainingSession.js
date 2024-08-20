@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Select from 'react-select';
 
 const AddTrainingSession = () => {
   const [trainingPlanId, setTrainingPlanId] = useState('');
@@ -13,14 +14,18 @@ const AddTrainingSession = () => {
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
-    // Haal de lijst van oefeningen op vanuit de API
-    axios.get(`${apiBaseUrl}/exercise`)
-      .then(response => setExercises(response.data))
+    axios.get(`${apiBaseUrl}/excercise`)
+      .then(response => {
+        console.log('Exercises data:', response.data);
+        setExercises(response.data);
+      })
       .catch(error => console.error('Error fetching exercises:', error));
     
-    // Haal de lijst van trainingsplannen op vanuit de API
     axios.get(`${apiBaseUrl}/trainingPlans`)
-      .then(response => setTrainingPlans(response.data))
+      .then(response => {
+        console.log('Training plans data:', response.data);
+        setTrainingPlans(response.data);
+      })
       .catch(error => console.error('Error fetching training plans:', error));
   }, [apiBaseUrl]);
 
@@ -34,9 +39,20 @@ const AddTrainingSession = () => {
     }
   }
 
-  const handleExerciseChange = (index, field, value) => {
+  const handleExerciseChange = (index, selectedOption) => {
+    const updatedExerciseList = [...exerciseList];
+    updatedExerciseList[index]['exerciseId'] = selectedOption.value;
+    setExerciseList(updatedExerciseList);
+  };
+
+  const handleInputChange = (index, field, value) => {
     const updatedExerciseList = [...exerciseList];
     updatedExerciseList[index][field] = value;
+
+    if (field === 'start') {
+      updatedExerciseList[index]['end'] = value;  // Reset 'end' if 'start' changes
+    }
+
     setExerciseList(updatedExerciseList);
   }
 
@@ -47,18 +63,12 @@ const AddTrainingSession = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Log de exerciseList om te controleren of de velden correct zijn ingevuld
-    console.log('Exercise List:', exerciseList);
-
     const exercisesData = exerciseList.map(exercise => ({
       exercise: exercise.exerciseId,
       sets: parseInt(exercise.sets),
       reprange: { start: parseInt(exercise.start), end: parseInt(exercise.end) },
       weight: parseInt(exercise.weight)
     }));
-
-    // Log de data die naar de server wordt verzonden
-    console.log('Exercises Data:', exercisesData);
 
     axios.post(`${apiBaseUrl}/trainingSessions`, {
       name: name,
@@ -73,6 +83,27 @@ const AddTrainingSession = () => {
       console.error('Error creating training session:', error.response ? error.response.data : error.message);
     });
   }
+
+  const exerciseOptions = exercises.map(exercise => ({
+    value: exercise._id,
+    label: exercise.name
+  }));
+
+  const customStyles = {
+    control: (provided) => ({
+      ...provided,
+      minWidth: '200px',
+      maxWidth: '300px',
+    }),
+    menu: (provided) => ({
+      ...provided,
+      width: '200px',
+    }),
+    option: (provided) => ({
+      ...provided,
+      padding: '5px 10px',
+    }),
+  };
 
   return (
     <div>
@@ -92,9 +123,13 @@ const AddTrainingSession = () => {
           <label>Training Plan ID:</label>
           <select value={trainingPlanId} onChange={handleTrainingPlanChange} required>
             <option value="">Select Existing Training Plan</option>
-            {trainingPlans.map(plan => (
-              <option key={plan._id} value={plan._id}>{plan.name}</option>
-            ))}
+            {trainingPlans.length > 0 ? (
+              trainingPlans.map(plan => (
+                <option key={plan._id} value={plan._id}>{plan.name}</option>
+              ))
+            ) : (
+              <option value="">No training plans available</option>
+            )}
             <option value="new">New Training Plan</option>
           </select>
           {trainingPlanId === '' && (
@@ -108,35 +143,62 @@ const AddTrainingSession = () => {
           <div key={index}>
             <div>
               <label>Exercise:</label>
-              <select value={exercise.exerciseId} onChange={(e) => handleExerciseChange(index, 'exerciseId', e.target.value)} required>
-                <option value="">Select Exercise</option>
-                {exercises.map(exercise => (
-                  <option key={exercise._id} value={exercise._id}>{exercise.name}</option>
+              <Select
+                options={exerciseOptions}
+                onChange={(selectedOption) => handleExerciseChange(index, selectedOption)}
+                value={exerciseOptions.find(option => option.value === exercise.exerciseId)}
+                placeholder="Type to search..."
+                styles={customStyles}
+                isClearable
+              />
+            </div>
+            <div>
+              <label>Sets:</label>
+              <input
+                type="number"
+                value={exercise.sets}
+                onChange={(e) => handleInputChange(index, 'sets', e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label>Rep Range Start:</label>
+              <select value={exercise.start} onChange={(e) => handleInputChange(index, 'start', parseInt(e.target.value))} required>
+                {[...Array(20).keys()].map(i => (
+                  <option key={i+1} value={i+1}>{i+1}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label>Sets:</label>
-              <input type="number" value={exercise.sets} onChange={(e) => handleExerciseChange(index, 'sets', e.target.value)} required />
-            </div>
-            <div>
-              <label>Rep Range Start:</label>
-              <input type="number" value={exercise.start} onChange={(e) => handleExerciseChange(index, 'start', e.target.value)} required />
-            </div>
-            <div>
               <label>Rep Range End:</label>
-              <input type="number" value={exercise.end} onChange={(e) => handleExerciseChange(index, 'end', e.target.value)} required />
+              <select value={exercise.end} onChange={(e) => handleInputChange(index, 'end', parseInt(e.target.value))} required>
+                {exercise.start && [...Array(21 - parseInt(exercise.start)).keys()]
+                  .filter(i => i + parseInt(exercise.start) <= 20)
+                  .map(i => (
+                    <option key={i + parseInt(exercise.start)} value={i + parseInt(exercise.start)}>{i + parseInt(exercise.start)}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label>Weight:</label>
-              <input type="number" value={exercise.weight} onChange={(e) => handleExerciseChange(index, 'weight', e.target.value)} required />
+              <input
+                type="number"
+                value={exercise.weight}
+                onChange={(e) => handleInputChange(index, 'weight', e.target.value)}
+                required
+              />
             </div>
           </div>
         ))}
         <button type="button" onClick={addExerciseField}>Add Exercise</button>
         <div>
           <label>Session Number:</label>
-          <input type="number" value={sessionNumber} onChange={(e) => setSessionNumber(e.target.value)} required />
+          <input
+            type="number"
+            value={sessionNumber}
+            onChange={(e) => setSessionNumber(e.target.value)}
+            required
+          />
         </div>
         <button type="submit">Add Training Session</button>
       </form>

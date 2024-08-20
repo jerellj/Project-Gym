@@ -7,6 +7,7 @@ import SearchExercises from './components/SearchExercises';
 import TrackProgress from './components/TrackProgress';
 import ListTrainingSession from './components/ShowTrainingSessions';
 import TrainingSessionDetails from './components/TrainingSessionDetails';
+import UsersList from './components/UsersList';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
             <li><Link to="/add-training-session">Add Training Session</Link></li>
             <li><Link to="/track-progress">Track Progress</Link></li>
             <li><Link to="/list-trainingsessions">List Sessions</Link></li>
+            <li><Link to="/user">Users</Link></li>
           </ul>
         </nav>
         <Routes>
@@ -31,6 +33,7 @@ function App() {
           <Route path="/track-progress" element={<TrackProgress />} />
           <Route path="/list-trainingsessions" element={<ListTrainingSession />} />
           <Route path="/trainingSessions/:id" element={<TrainingSessionDetails />} />
+          <Route path="/user" element={<UsersList />} />
         </Routes>
       </div>
     </Router>
