@@ -25,9 +25,47 @@ const ProgressView = () => {
   }, [selectedUser, selectedTrainingPlan, apiBaseUrl]);
 
   useEffect(() => {
+    const prefillProgress = (lastProgress) => {
+      const filledProgress = {};
+
+      selectedTrainingSession.exercises.forEach(exerciseDetail => {
+        const lastExerciseProgress = lastProgress?.exerciseProgress.find(ep => ep.exercise._id === exerciseDetail.exercise._id);
+
+        filledProgress[exerciseDetail.exercise._id] = [...Array(exerciseDetail.sets)].map((_, setIndex) => {
+          let reps, weight;
+
+          if (lastExerciseProgress && lastExerciseProgress.sets[setIndex]) {
+            const lastSet = lastExerciseProgress.sets[setIndex];
+            const { start, end } = exerciseDetail.reprange;
+
+            if (lastSet.reps < start) {
+              reps = start;
+              weight = lastSet.weight;
+            } else if (lastSet.reps >= end) {
+              reps = start;
+              weight = lastSet.weight + 2.5;
+            } else {
+              reps = lastSet.reps + 1 > end ? end : lastSet.reps + 1;
+              weight = lastSet.weight;
+            }
+          } else {
+            reps = exerciseDetail.reprange.start;
+            weight = 0;
+          }
+
+          return { reps, weight };
+        });
+      });
+
+      setNewProgress(filledProgress);
+    };
+
     if (selectedUser && selectedTrainingSession) {
       axios.get(`${apiBaseUrl}/progress/session/${selectedUser._id}/${selectedTrainingSession._id}`)
-        .then(response => setProgress(response.data))
+        .then(response => {
+          setProgress(response.data);
+          prefillProgress(response.data);
+        })
         .catch(error => console.error('Error fetching progress:', error));
     }
   }, [selectedUser, selectedTrainingSession, apiBaseUrl]);
@@ -85,11 +123,11 @@ const ProgressView = () => {
   };
 
   return (
-    <div className="w3-container w3-padding-32">
-      <h1 className="w3-center w3-text-teal">Track Progress</h1>
-      <div className="w3-margin-bottom">
-        <label className="w3-text-teal"><strong>Select User:</strong></label>
-        <select className="w3-select" onChange={handleUserChange}>
+    <div>
+      <h1>Track Progress</h1>
+      <div>
+        <label>Select User:</label>
+        <select onChange={handleUserChange}>
           <option value="">Select a user</option>
           {users.map(user => (
             <option key={user._id} value={user._id}>{user.name}</option>
@@ -97,9 +135,9 @@ const ProgressView = () => {
         </select>
       </div>
       {selectedTrainingPlan && (
-        <div className="w3-margin-bottom">
-          <label className="w3-text-teal"><strong>Select Training Session:</strong></label>
-          <select className="w3-select" onChange={handleTrainingSessionChange} value={selectedTrainingSession ? selectedTrainingSession._id : ''}>
+        <div>
+          <label>Select Training Session:</label>
+          <select onChange={handleTrainingSessionChange} value={selectedTrainingSession ? selectedTrainingSession._id : ''}>
             <option value="">Select a training session</option>
             {selectedTrainingPlan.trainings.map(session => (
               <option key={session._id} value={session._id}>{session.name}</option>
@@ -108,44 +146,56 @@ const ProgressView = () => {
         </div>
       )}
       {selectedTrainingSession && selectedTrainingSession.exercises && (
-        <div className="w3-card-4 w3-padding w3-margin-top">
-          <h2 className="w3-center w3-text-teal"><strong>Session name:</strong> {selectedTrainingSession.name}</h2>
-          <ul className="w3-ul">
+        <div>
+          <h2><strong>Session name:</strong> {selectedTrainingSession.name}</h2>
+          <ul>
             {selectedTrainingSession.exercises.map((exerciseDetail, index) => (
-              <li key={index} className="w3-padding-16">
+              <li key={index} style={{ marginBottom: '20px' }}>
                 <div>
-                  <h3 className="w3-text-teal">{exerciseDetail.exercise.name}</h3>
-                  <p>Sets: {exerciseDetail.sets}</p>
-                  {[...Array(exerciseDetail.sets)].map((_, setIndex) => (
-                    <div key={setIndex} className="w3-margin-bottom">
-                      <input
-                        className="w3-input w3-border w3-margin-bottom"
-                        type="number"
-                        placeholder="Weight"
-                        value={newProgress[exerciseDetail.exercise._id]?.[setIndex]?.weight || ''}
-                        onChange={(e) => handleProgressChange(exerciseDetail.exercise._id, setIndex, 'weight', e.target.value)}
-                      />
-                      <input
-                        className="w3-input w3-border"
-                        type="number"
-                        placeholder="Reps"
-                        value={newProgress[exerciseDetail.exercise._id]?.[setIndex]?.reps || ''}
-                        onChange={(e) => handleProgressChange(exerciseDetail.exercise._id, setIndex, 'reps', e.target.value)}
-                      />
-                    </div>
-                  ))}
+                  <h3>{exerciseDetail.exercise.name}</h3>
+                  <p>Sets: {exerciseDetail.sets} | Rep Range: {exerciseDetail.reprange.start} - {exerciseDetail.reprange.end}</p>
+                  <table style={{ width: '50%', textAlign: 'left' }}>
+                    <thead>
+                      <tr>
+                        <th style={{ width: '50%' }}>Weight</th>
+                        <th style={{ width: '50%' }}>Reps</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...Array(exerciseDetail.sets)].map((_, setIndex) => (
+                        <tr key={setIndex}>
+                          <td>
+                            <input
+                              type="number"
+                              placeholder="Weight"
+                              value={newProgress[exerciseDetail.exercise._id]?.[setIndex]?.weight || ''}
+                              onChange={(e) => handleProgressChange(exerciseDetail.exercise._id, setIndex, 'weight', e.target.value)}
+                            />
+                          </td>
+                          <td>
+                            <input
+                              type="number"
+                              placeholder="Reps"
+                              value={newProgress[exerciseDetail.exercise._id]?.[setIndex]?.reps || ''}
+                              onChange={(e) => handleProgressChange(exerciseDetail.exercise._id, setIndex, 'reps', e.target.value)}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </li>
             ))}
           </ul>
-          <button className="w3-button w3-teal w3-margin-top" onClick={handleSubmit}>Save Progress</button>
-          <h2 className="w3-text-teal w3-margin-top">Latest Progress</h2>
+          <button onClick={handleSubmit}>Save Progress</button>
+          <h2>Latest Progress</h2>
           {progress ? (
-            <ul className="w3-ul w3-border">
-              <li className="w3-padding-16">
+            <ul>
+              <li>
                 <p>Date: {new Date(progress.date).toLocaleDateString()}</p>
                 {progress.exerciseProgress && Array.isArray(progress.exerciseProgress) && progress.exerciseProgress.map((exercise, i) => (
-                  <div key={i} className="w3-margin-bottom">
+                  <div key={i}>
                     <p>Exercise: {exercise.exercise.name}</p>
                     {exercise.sets.map((set, setIndex) => (
                       <div key={setIndex}>
@@ -157,10 +207,10 @@ const ProgressView = () => {
               </li>
             </ul>
           ) : (
-            <p className="w3-text-teal">Nog geen eerdere progressie</p>
+            <p>Nog geen eerdere progressie</p>
           )}
         </div>
-      )}
+      )} 
     </div>
   );
 }

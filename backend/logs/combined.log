@@ -258,3 +258,5 @@
 {"level":"info","message":"Server draait op poort 5001","timestamp":"2024-07-24T16:05:42.133Z"}
 {"level":"info","message":"Verbonden met MongoDB","timestamp":"2024-08-19T11:42:51.037Z"}
 {"level":"info","message":"Server draait op poort 5001","timestamp":"2024-08-19T11:42:51.040Z"}
+{"level":"info","message":"Verbonden met MongoDB","timestamp":"2024-08-20T12:11:35.603Z"}
+{"level":"info","message":"Server draait op poort 5001","timestamp":"2024-08-20T12:11:35.606Z"}
