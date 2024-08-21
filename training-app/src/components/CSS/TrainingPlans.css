@@ -1,0 +1,67 @@
+/* TrainingPlans.css */
+
+.training-plans-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+  }
+  
+  .title {
+    text-align: center;
+    color: #444;
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+  }
+  
+  .plans-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .plan-card {
+    background-color: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+  }
+  
+  .plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+  
+  .plan-card h2 {
+    margin-top: 0;
+    color: #333;
+  }
+  
+  .plan-details {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .plan-details ul {
+    list-style-type: disc;
+    padding-left: 20px;
+  }
+  
+  .plan-details ul li {
+    margin-bottom: 10px;
+  }
+  
+  .plan-details a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .plan-details a:hover {
+    text-decoration: underline;
+  }

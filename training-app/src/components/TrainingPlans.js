@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './CSS/TrainingPlans.css'; // Voeg een aangepast CSS-bestand toe
 
 const TrainingPlans = () => {
   const [trainingPlans, setTrainingPlans] = useState([]);
@@ -13,10 +14,23 @@ const TrainingPlans = () => {
   }, [apiBaseUrl]);
 
   return (
-    <div>
-      <h1>Training Plans</h1>
+    <div className="training-plans-container">
+      <h1 className="title">Training Plans</h1>
+      <div className="plans-list">
+        {trainingPlans.map(trainingPlan => (
+          <div 
+            key={trainingPlan._id} 
+            className="plan-card"
+            onClick={() => setSelectedTrainingPlan(trainingPlan)}
+          >
+            <h2>{trainingPlan.name}</h2>
+            <p>Duration: {trainingPlan.weeks} weeks</p>
+            <p>Sessions per week: {trainingPlan.sessionsPerWeek}</p>
+          </div>
+        ))}
+      </div>
       {selectedTrainingPlan && (
-        <div>
+        <div className="plan-details">
           <h2>Training Plan Details</h2>
           <p><strong>Name:</strong> {selectedTrainingPlan.name}</p>
           <p><strong>Duration:</strong> {selectedTrainingPlan.weeks}</p>
@@ -26,20 +40,13 @@ const TrainingPlans = () => {
             {selectedTrainingPlan.trainings.map((training, index) => (
               <li key={index}>
                 <a href={`/trainingSessions/${training._id}`} target="_blank" rel="noreferrer">
-                  <strong>Workout Name:</strong> {training.name}
+                  {training.name}
                 </a>
               </li>
             ))}
           </ul>
         </div>
       )}
-      <ul>
-        {trainingPlans.map(trainingPlan => (
-          <li key={trainingPlan._id} onClick={() => setSelectedTrainingPlan(trainingPlan)}>
-            {trainingPlan.name}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

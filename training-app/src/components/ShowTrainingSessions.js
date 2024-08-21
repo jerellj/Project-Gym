@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import './CSS/ShowTrainingSessions.css'; // Voeg een aangepast CSS-bestand toe
 
 const ShowTrainingSessions = ({ onSelectTrainingsession }) => {
-
-    const [trainingsessions, setTrainingsessions] = useState([]);
-    const [selectedTrainingsession, setSelectedTrainingsession] = useState(null);
+  const [trainingsessions, setTrainingsessions] = useState([]);
+  const [selectedTrainingsession, setSelectedTrainingsession] = useState(null);
 
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
@@ -17,31 +17,37 @@ const ShowTrainingSessions = ({ onSelectTrainingsession }) => {
   }, [apiBaseUrl]);
 
   return (
-    <div>
-      <h2>Select a Trainingssession</h2>
+    <div className="show-training-sessions-container">
+      <h2 className="title">Select a Training Session</h2>
+      <div className="training-sessions-list">
+        <ul>
+          {trainingsessions.map(trainingsession => (
+            <li 
+              key={trainingsession._id} 
+              className="session-item"
+              onClick={() => setSelectedTrainingsession(trainingsession)}
+            >
+              {trainingsession.name}
+            </li>
+          ))}
+        </ul>
+      </div>
       {selectedTrainingsession && (
-        <div>
-          <h2>Training Session Details</h2>
+        <div className="training-session-details">
+          <h2 className="details-title">Training Session Details</h2>
           <p><strong>Name:</strong> {selectedTrainingsession.name}</p>
-          <p><strong>Trainingsschema:</strong> {selectedTrainingsession.trainingPlan}</p>
-          <p><strong>Sessie Nummer:</strong> {selectedTrainingsession.sessionNumber}</p>
-          <p><strong>Excercise:</strong></p>
-          <ul>
+          <p><strong>Training Plan:</strong> {selectedTrainingsession.trainingPlan}</p>
+          <p><strong>Session Number:</strong> {selectedTrainingsession.sessionNumber}</p>
+          <p><strong>Exercises:</strong></p>
+          <ul className="exercise-list">
             {selectedTrainingsession.exercises.map((exercise, index) => (
-              <li key={index}>
+              <li key={index} className="exercise-item">
                 <p><strong>Exercise Name:</strong> {exercise.exercise.name}</p>
               </li>
             ))}
-          </ul> 
+          </ul>
         </div>
       )}
-      <ul>
-        {trainingsessions.map(trainingsession => (
-          <li key={trainingsession._id} onClick={() => setSelectedTrainingsession(trainingsession)}>
-            {trainingsession.name}
-          </li>
-        ))}
-      </ul>
     </div>
   );
 }

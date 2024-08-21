@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import './CSS/ProgressView.css';
 
 const ProgressView = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedTrainingPlan, setSelectedTrainingPlan] = useState(null);
   const [selectedTrainingSession, setSelectedTrainingSession] = useState(null);
-  const [progress, setProgress] = useState(null); // Change to hold single progress object
+  const [progress, setProgress] = useState(null);
   const [newProgress, setNewProgress] = useState({});
+  const [showLatestProgress, setShowLatestProgress] = useState(false);
+
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
   useEffect(() => {
@@ -99,6 +102,7 @@ const ProgressView = () => {
     })
       .then(response => {
         setProgress(response.data.progress);
+        setShowLatestProgress(true);
       })
       .catch(error => console.error('Error adding progress:', error));
   };
@@ -123,9 +127,9 @@ const ProgressView = () => {
   };
 
   return (
-    <div>
+    <div className="progress-view-container">
       <h1>Track Progress</h1>
-      <div>
+      <div className="user-selection">
         <label>Select User:</label>
         <select onChange={handleUserChange}>
           <option value="">Select a user</option>
@@ -135,7 +139,7 @@ const ProgressView = () => {
         </select>
       </div>
       {selectedTrainingPlan && (
-        <div>
+        <div className="session-selection">
           <label>Select Training Session:</label>
           <select onChange={handleTrainingSessionChange} value={selectedTrainingSession ? selectedTrainingSession._id : ''}>
             <option value="">Select a training session</option>
@@ -146,52 +150,53 @@ const ProgressView = () => {
         </div>
       )}
       {selectedTrainingSession && selectedTrainingSession.exercises && (
-        <div>
+        <div className="session-details">
           <h2><strong>Session name:</strong> {selectedTrainingSession.name}</h2>
-          <ul>
+          <div className="exercise-list">
             {selectedTrainingSession.exercises.map((exerciseDetail, index) => (
-              <li key={index} style={{ marginBottom: '20px' }}>
-                <div>
-                  <h3>{exerciseDetail.exercise.name}</h3>
-                  <p>Sets: {exerciseDetail.sets} | Rep Range: {exerciseDetail.reprange.start} - {exerciseDetail.reprange.end}</p>
-                  <table style={{ width: '50%', textAlign: 'left' }}>
-                    <thead>
-                      <tr>
-                        <th style={{ width: '50%' }}>Weight</th>
-                        <th style={{ width: '50%' }}>Reps</th>
+              <div key={index} className="exercise-item">
+                <h3>{exerciseDetail.exercise.name}</h3>
+                <p>Sets: {exerciseDetail.sets} | Rep Range: {exerciseDetail.reprange.start} - {exerciseDetail.reprange.end}</p>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Weight</th>
+                      <th>Reps</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...Array(exerciseDetail.sets)].map((_, setIndex) => (
+                      <tr key={setIndex}>
+                        <td>
+                          <input
+                            type="number"
+                            placeholder="Weight"
+                            value={newProgress[exerciseDetail.exercise._id]?.[setIndex]?.weight || ''}
+                            onChange={(e) => handleProgressChange(exerciseDetail.exercise._id, setIndex, 'weight', e.target.value)}
+                          />
+                        </td>
+                        <td>
+                          <input
+                            type="number"
+                            placeholder="Reps"
+                            value={newProgress[exerciseDetail.exercise._id]?.[setIndex]?.reps || ''}
+                            onChange={(e) => handleProgressChange(exerciseDetail.exercise._id, setIndex, 'reps', e.target.value)}
+                          />
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {[...Array(exerciseDetail.sets)].map((_, setIndex) => (
-                        <tr key={setIndex}>
-                          <td>
-                            <input
-                              type="number"
-                              placeholder="Weight"
-                              value={newProgress[exerciseDetail.exercise._id]?.[setIndex]?.weight || ''}
-                              onChange={(e) => handleProgressChange(exerciseDetail.exercise._id, setIndex, 'weight', e.target.value)}
-                            />
-                          </td>
-                          <td>
-                            <input
-                              type="number"
-                              placeholder="Reps"
-                              value={newProgress[exerciseDetail.exercise._id]?.[setIndex]?.reps || ''}
-                              onChange={(e) => handleProgressChange(exerciseDetail.exercise._id, setIndex, 'reps', e.target.value)}
-                            />
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </li>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ))}
-          </ul>
-          <button onClick={handleSubmit}>Save Progress</button>
+          </div>
+          <button className="save-button" onClick={handleSubmit}>Save Progress</button>
           <h2>Latest Progress</h2>
-          {progress ? (
-            <ul>
+          <button className="toggle-button" onClick={() => setShowLatestProgress(!showLatestProgress)}>
+            {showLatestProgress ? 'Hide Latest Progress' : 'Show Latest Progress'}
+          </button>
+          {showLatestProgress && progress ? (
+            <ul className="latest-progress">
               <li>
                 <p>Date: {new Date(progress.date).toLocaleDateString()}</p>
                 {progress.exerciseProgress && Array.isArray(progress.exerciseProgress) && progress.exerciseProgress.map((exercise, i) => (
@@ -207,10 +212,10 @@ const ProgressView = () => {
               </li>
             </ul>
           ) : (
-            <p>Nog geen eerdere progressie</p>
+            <p>No recent progress recorded</p>
           )}
         </div>
-      )} 
+      )}
     </div>
   );
 }

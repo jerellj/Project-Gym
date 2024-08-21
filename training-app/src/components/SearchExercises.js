@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import './CSS/SearchExercises.css';
 
 const SearchExercises = () => {
   const [exercises, setExercises] = useState([]);
@@ -7,24 +8,32 @@ const SearchExercises = () => {
   const [searchName, setSearchName] = useState('');
   const [category, setCategory] = useState('');
   const [primaryMuscles, setPrimaryMuscles] = useState('');
-  const [selectedExercise, setSelectedExercise] = useState(null);
+  const [selectedExerciseId, setSelectedExerciseId] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [primaryMuscleGroups, setPrimaryMuscleGroups] = useState([]);
 
   const apiBaseUrl = process.env.REACT_APP_API_BASE_URL;
 
-  console.log('API Base URL:', apiBaseUrl); // Controleer de waarde van apiBaseUrl
-
   useEffect(() => {
-    // Haal alle oefeningen op bij het laden van de component
     axios.get(`${apiBaseUrl}/Excercise/excercises`)
       .then(response => {
-        console.log('Fetched exercises:', response.data); // Debugging line
-        setExercises(response.data); 
+        const exercisesData = response.data;
+        setExercises(exercisesData);
+        extractFilterData(exercisesData);
       })
-      .catch(error => console.error('Error fetching exercises:', error)); // Debugging line
+      .catch(error => console.error('Error fetching exercises:', error));
   }, [apiBaseUrl]);
 
+  const extractFilterData = (exercisesData) => {
+    const uniqueCategories = Array.from(new Set(exercisesData.flatMap(exercise => exercise.category).filter(Boolean)));
+    const uniquePrimaryMuscles = Array.from(new Set(exercisesData.flatMap(exercise => exercise.primaryMuscles).filter(Boolean)));
+
+    setCategories(uniqueCategories);
+    setPrimaryMuscleGroups(uniquePrimaryMuscles);
+  };
+
   const handleSearch = useCallback(() => {
-    let results = exercises; 
+    let results = exercises;
 
     if (searchName.length >= 3) {
       results = results.filter(exercise => exercise.name.toLowerCase().includes(searchName.toLowerCase()));
@@ -38,19 +47,26 @@ const SearchExercises = () => {
       results = results.filter(exercise => exercise.primaryMuscles.includes(primaryMuscles));
     }
 
-    console.log('Filtered results:', results); // Debugging line
     setFilteredExercises(results);
   }, [searchName, category, primaryMuscles, exercises]);
 
   useEffect(() => {
     handleSearch();
-  }, [searchName, category, primaryMuscles, handleSearch]); // Voeg 'handleSearch' toe als dependency
+  }, [searchName, category, primaryMuscles, handleSearch]);
+
+  const toggleExerciseDetails = (exerciseId) => {
+    if (selectedExerciseId === exerciseId) {
+      setSelectedExerciseId(null);
+    } else {
+      setSelectedExerciseId(exerciseId);
+    }
+  };
 
   return (
-    <div>
-      <h1>Search Exercises</h1>
-      <div>
-        <label>Search by Name:</label>
+    <div className="search-exercises-container">
+      <h1>Find Your Exercise</h1>
+      <div className="search-bar">
+        <label>Search:</label>
         <input 
           type="text" 
           value={searchName} 
@@ -58,64 +74,46 @@ const SearchExercises = () => {
           placeholder="Type at least 3 characters" 
         />
       </div>
-      <div>
+      <div className="filters">
         <label>Category:</label>
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="">Select Category</option>
-          <option value="strength">Strength</option>
-          <option value="cardio">Cardio</option>
-          <option value="stretching">Stretching</option>
-          <option value="plyometrics">Plyometrics</option>
-          <option value="powerlifting">Powerlifting</option>
-          <option value="strongman">Strongman</option>
-          <option value="olympic weightlifting">Olympic Weightlifting</option>
+          {categories.map((cat, index) => (
+            <option key={index} value={cat}>{cat}</option>
+          ))}
         </select>
-      </div>
-      <div>
         <label>Primary Muscles:</label>
         <select value={primaryMuscles} onChange={(e) => setPrimaryMuscles(e.target.value)}>
           <option value="">Select Primary Muscle</option>
-          <option value="abdominals">Abdominals</option>
-          <option value="adductors">Adductors</option>
-          <option value="calves">Calves</option>
-          <option value="forearms">Forearms</option>
-          <option value="hamstrings">Hamstrings</option>
-          <option value="lower back">Lower back</option>
-          <option value="neck">Neck</option>
-          <option value="shoulders">Shoulders</option>
-          <option value="triceps">Triceps</option>
-          <option value="abductors">Abductors</option>
-          <option value="biceps">Biceps</option>
-          <option value="chest">Chest</option>
-          <option value="glutes">Glutes</option>
-          <option value="lats">Lats</option>
-          <option value="middle back">Middle back</option>
-          <option value="quadriceps">Quadriceps</option>
-          <option value="traps">Traps</option>
+          {primaryMuscleGroups.map((muscle, index) => (
+            <option key={index} value={muscle}>{muscle}</option>
+          ))}
         </select>
       </div>
-      {selectedExercise && (
-        <div>
-          <h2>Exercise Details</h2>
-          <p><strong>Name:</strong> {selectedExercise.name}</p>
-          <p><strong>Category:</strong> {selectedExercise.category}</p>
-          <p><strong>Primary Muscles:</strong> {selectedExercise.primaryMuscles.join(', ')}</p>
-          <p><strong>Secondary Muscles:</strong> {selectedExercise.secondaryMuscles.join(', ')}</p>
-          <p><strong>Instructions:</strong></p>
-          <ul>
-            {selectedExercise.instructions.map((instruction, index) => (
-              <li key={index}>{instruction}</li>
-            ))}
-          </ul>
-        </div>
-      )}      
-      <ul>
+      <div className="exercise-list">
         {filteredExercises.map(exercise => (
-          <li key={exercise._id} onClick={() => setSelectedExercise(exercise)}>
-            {exercise.name}
-          </li>
+          <div 
+            key={exercise._id} 
+            className="exercise-card" 
+            onClick={() => toggleExerciseDetails(exercise._id)}
+          >
+            <h2>{exercise.name}</h2>
+            <p>Category: {exercise.category}</p>
+            {selectedExerciseId === exercise._id && (
+              <div className="exercise-details">
+                <p>Primary Muscles: {exercise.primaryMuscles.join(', ')}</p>
+                <p>Secondary Muscles: {exercise.secondaryMuscles.join(', ')}</p>
+                <p>Instructions:</p>
+                <ul>
+                  {exercise.instructions.map((instruction, index) => (
+                    <li key={index}>{instruction}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
 }

@@ -10,7 +10,8 @@ const ProgressSchema = new mongoose.Schema({
             reps: { type: Number, required: true },
             weight: { type: Number }
         }]
-    }]
+    }],
+    notes: { type: String }
 });
 
 const Progress = mongoose.model('Progress', ProgressSchema);

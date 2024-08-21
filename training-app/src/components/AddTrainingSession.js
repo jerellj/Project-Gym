@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
+import './CSS/AddTrainingSession.css'; // Voeg een aangepast CSS-bestand toe
 
 const AddTrainingSession = () => {
   const [trainingPlanId, setTrainingPlanId] = useState('');
@@ -16,14 +17,12 @@ const AddTrainingSession = () => {
   useEffect(() => {
     axios.get(`${apiBaseUrl}/excercise`)
       .then(response => {
-        console.log('Exercises data:', response.data);
         setExercises(response.data);
       })
       .catch(error => console.error('Error fetching exercises:', error));
     
     axios.get(`${apiBaseUrl}/trainingPlans`)
       .then(response => {
-        console.log('Training plans data:', response.data);
         setTrainingPlans(response.data);
       })
       .catch(error => console.error('Error fetching training plans:', error));
@@ -106,10 +105,10 @@ const AddTrainingSession = () => {
   };
 
   return (
-    <div>
-      <h1>Add Training Session</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
+    <div className="add-training-session-container">
+      <h1 className="title">Add Training Session</h1>
+      <form onSubmit={handleSubmit} className="training-session-form">
+        <div className="form-group">
           <label>Name:</label>
           <input 
             type="text" 
@@ -119,7 +118,7 @@ const AddTrainingSession = () => {
             required
           />
         </div>
-        <div>
+        <div className="form-group">
           <label>Training Plan ID:</label>
           <select value={trainingPlanId} onChange={handleTrainingPlanChange} required>
             <option value="">Select Existing Training Plan</option>
@@ -133,15 +132,20 @@ const AddTrainingSession = () => {
             <option value="new">New Training Plan</option>
           </select>
           {trainingPlanId === '' && (
-            <div>
+            <div className="form-group">
               <label>New Training Plan ID:</label>
-              <input type="text" value={newTrainingPlanId} onChange={(e) => setNewTrainingPlanId(e.target.value)} required />
+              <input 
+                type="text" 
+                value={newTrainingPlanId} 
+                onChange={(e) => setNewTrainingPlanId(e.target.value)} 
+                required 
+              />
             </div>
           )}
         </div>
         {exerciseList.map((exercise, index) => (
-          <div key={index}>
-            <div>
+          <div key={index} className="exercise-group">
+            <div className="form-group">
               <label>Exercise:</label>
               <Select
                 options={exerciseOptions}
@@ -152,7 +156,7 @@ const AddTrainingSession = () => {
                 isClearable
               />
             </div>
-            <div>
+            <div className="form-group">
               <label>Sets:</label>
               <input
                 type="number"
@@ -161,7 +165,7 @@ const AddTrainingSession = () => {
                 required
               />
             </div>
-            <div>
+            <div className="form-group">
               <label>Rep Range Start:</label>
               <select value={exercise.start} onChange={(e) => handleInputChange(index, 'start', parseInt(e.target.value))} required>
                 {[...Array(20).keys()].map(i => (
@@ -169,7 +173,7 @@ const AddTrainingSession = () => {
                 ))}
               </select>
             </div>
-            <div>
+            <div className="form-group">
               <label>Rep Range End:</label>
               <select value={exercise.end} onChange={(e) => handleInputChange(index, 'end', parseInt(e.target.value))} required>
                 {exercise.start && [...Array(21 - parseInt(exercise.start)).keys()]
@@ -179,8 +183,8 @@ const AddTrainingSession = () => {
                 ))}
               </select>
             </div>
-            <div>
-              <label>Weight:</label>
+            <div className="form-group">
+              <label>Weight (kg):</label>
               <input
                 type="number"
                 value={exercise.weight}
@@ -190,8 +194,8 @@ const AddTrainingSession = () => {
             </div>
           </div>
         ))}
-        <button type="button" onClick={addExerciseField}>Add Exercise</button>
-        <div>
+        <button type="button" className="add-exercise-button" onClick={addExerciseField}>Add Exercise</button>
+        <div className="form-group">
           <label>Session Number:</label>
           <input
             type="number"
@@ -200,7 +204,7 @@ const AddTrainingSession = () => {
             required
           />
         </div>
-        <button type="submit">Add Training Session</button>
+        <button type="submit" className="submit-button">Add Training Session</button>
       </form>
     </div>
   );

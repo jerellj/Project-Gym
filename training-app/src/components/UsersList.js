@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Select from 'react-select';
+import './CSS/UsersList.css'; // Voeg een aangepast CSS-bestand toe
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -76,29 +77,29 @@ const UserList = () => {
   const customStyles = {
     control: (provided) => ({
       ...provided,
-      minWidth: '200px',  // Set minimum width for the dropdown
-      maxWidth: '300px',  // Set maximum width for the dropdown
+      minWidth: '200px',
+      maxWidth: '300px',
     }),
     menu: (provided) => ({
       ...provided,
-      width: '200px',  // Set width of the dropdown menu
+      width: '200px',
     }),
     option: (provided) => ({
       ...provided,
-      padding: '5px 10px',  // Adjust padding for options
+      padding: '5px 10px',
     }),
   };
 
   return (
-    <div>
-      <h2>Create new user or select User</h2>
-      <button onClick={() => setShowCreateUserForm(!showCreateUserForm)}>
+    <div className="user-list-container">
+      <h2 className="title">Create New User or Select User</h2>
+      <button className="toggle-button" onClick={() => setShowCreateUserForm(!showCreateUserForm)}>
         {showCreateUserForm ? 'Cancel' : 'Create New User'}
       </button>
 
       {showCreateUserForm ? (
-        <form onSubmit={handleCreateUser}>
-          <div>
+        <form onSubmit={handleCreateUser} className="create-user-form">
+          <div className="form-group">
             <label>Name:</label>
             <input
               type="text"
@@ -108,7 +109,7 @@ const UserList = () => {
               required
             />
           </div>
-          <div>
+          <div className="form-group">
             <label>Email:</label>
             <input
               type="email"
@@ -118,26 +119,26 @@ const UserList = () => {
               required
             />
           </div>
-          <button type="submit">Create User</button>
+          <button type="submit" className="submit-button">Create User</button>
         </form>
       ) : (
-        <>
+        <div className="select-user">
           <label>Search and Select User:</label>
           <Select
             options={userOptions}
             onChange={handleUserChange}
             isClearable
             placeholder="Type to search..."
-            styles={customStyles}  // Apply custom styles
+            styles={customStyles}
           />
-        </>
+        </div>
       )}
 
       {selectedUser && (
-        <div>
+        <div className="user-details">
           <h3>User: {selectedUser.name}</h3>
           {selectedUser.trainingPlans.length > 0 ? (
-            <div>
+            <div className="current-plans">
               <h4>Current Training Plans</h4>
               <ul>
                 {selectedUser.trainingPlans.map(plan => (
@@ -153,10 +154,10 @@ const UserList = () => {
               </ul>
             </div>
           ) : (
-            <div>
+            <div className="add-training-plan">
               <h4>No training plans found. Add a new one:</h4>
               <form onSubmit={handleAddTrainingPlan}>
-                <div>
+                <div className="form-group">
                   <label>Select Training Plan:</label>
                   <select onChange={handleTrainingPlanChange} required>
                     <option value="">Select a training plan</option>
@@ -165,7 +166,7 @@ const UserList = () => {
                     ))}
                   </select>
                 </div>
-                <button type="submit">Add Training Plan to User</button>
+                <button type="submit" className="submit-button">Add Training Plan to User</button>
               </form>
             </div>
           )}

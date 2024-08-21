@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 
 exports.getExcercises = async (req, res) => {
     try {
-        const excercises = await consExcercise.find(); // Selecteer alle klanten en sluit het wachtwoord uit
+        const excercises = await consExcercise.find(); 
         res.status(200).json(excercises);
     } catch (error) {
         logger.error('Error getting excersise:', error);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import './CSS/AddTrainingPlan.css'; // Voeg een aangepast CSS-bestand toe
 
 const AddTrainingPlan = () => {
   const [name, setName] = useState('');
@@ -20,31 +20,59 @@ const AddTrainingPlan = () => {
     })
       .then(response => {
         console.log('Training plan created:', response.data);
+        // Optioneel: Reset het formulier na succesvolle inzending
+        setName('');
+        setDescription('');
+        setWeeks('');
+        setSessionsPerWeek('');
       })
       .catch(error => console.error('Error creating training plan:', error));
   }
 
   return (
-    <div>
-      <h1>Add Training Plan</h1>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Name:</label>
-          <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+    <div className="add-training-plan-container">
+      <h1 className="title">Add Training Plan</h1>
+      <form onSubmit={handleSubmit} className="training-plan-form">
+        <div className="form-group">
+          <label htmlFor="name">Name:</label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
         </div>
-        <div>
-          <label>Description:</label>
-          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
+        <div className="form-group">
+          <label htmlFor="description">Description:</label>
+          <input
+            type="text"
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
         </div>
-        <div>
-          <label>Weeks:</label>
-          <input type="number" value={weeks} onChange={(e) => setWeeks(e.target.value)} required />
+        <div className="form-group">
+          <label htmlFor="weeks">Weeks:</label>
+          <input
+            type="number"
+            id="weeks"
+            value={weeks}
+            onChange={(e) => setWeeks(e.target.value)}
+            required
+          />
         </div>
-        <div>
-          <label>Sessions per Week:</label>
-          <input type="number" value={sessionsPerWeek} onChange={(e) => setSessionsPerWeek(e.target.value)} required />
+        <div className="form-group">
+          <label htmlFor="sessionsPerWeek">Sessions per Week:</label>
+          <input
+            type="number"
+            id="sessionsPerWeek"
+            value={sessionsPerWeek}
+            onChange={(e) => setSessionsPerWeek(e.target.value)}
+            required
+          />
         </div>
-        <button type="submit">Add Training Plan</button>
+        <button type="submit" className="submit-button">Add Training Plan</button>
       </form>
     </div>
   );

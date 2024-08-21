@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import TrainingPlans from './components/TrainingPlans';
 import AddTrainingPlan from './components/AddTrainingPlan';
@@ -8,23 +8,41 @@ import TrackProgress from './components/TrackProgress';
 import ListTrainingSession from './components/ShowTrainingSessions';
 import TrainingSessionDetails from './components/TrainingSessionDetails';
 import UsersList from './components/UsersList';
+import './CSS/NavBar.css'; // Voeg de CSS voor de navigatiebalk toe
 
+const NavBar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  return (
+    <nav className="navbar">
+      <div className="navbar-logo">MyLogo</div>
+      <div className={`navbar-menu ${isMenuOpen ? 'open' : ''}`}>
+        <Link to="/">Search Exercises</Link>
+        <Link to="/training-plans">Training Plans</Link>
+        <Link to="/add-training-plan">Add Training Plan</Link>
+        <Link to="/add-training-session">Add Training Session</Link>
+        <Link to="/track-progress">Track Progress</Link>
+        <Link to="/list-trainingsessions">List Sessions</Link>
+        <Link to="/user">Users</Link>
+      </div>
+      <div className="navbar-toggle" onClick={toggleMenu}>
+        <span className="bar"></span>
+        <span className="bar"></span>
+        <span className="bar"></span>
+      </div>
+    </nav>
+  );
+};
 
 function App() {
   return (
     <Router>
       <div className="App">
-        <nav>
-          <ul>
-            <li><Link to="/">Search Exercises</Link></li>
-            <li><Link to="/training-Plans">Training Plans</Link></li>
-            <li><Link to="/add-training-plan">Add Training Plan</Link></li>
-            <li><Link to="/add-training-session">Add Training Session</Link></li>
-            <li><Link to="/track-progress">Track Progress</Link></li>
-            <li><Link to="/list-trainingsessions">List Sessions</Link></li>
-            <li><Link to="/user">Users</Link></li>
-          </ul>
-        </nav>
+        <NavBar />
         <Routes>
           <Route path="/" element={<SearchExercises />} />
           <Route path="/training-plans" element={<TrainingPlans />} />

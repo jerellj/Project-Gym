@@ -27,7 +27,7 @@ const ProgressView = () => {
   useEffect(() => {
     const prefillProgress = (lastProgress) => {
       const filledProgress = {};
-      
+
       selectedTrainingSession.exercises.forEach(exerciseDetail => {
         const lastExerciseProgress = lastProgress?.exerciseProgress.find(ep => ep.exercise._id === exerciseDetail.exercise._id);
 
@@ -41,11 +41,11 @@ const ProgressView = () => {
             if (lastSet.reps < start) {
               reps = start;
               weight = lastSet.weight;
-            } else if (lastSet.reps > end) {
+            } else if (lastSet.reps >= end) {
               reps = start;
               weight = lastSet.weight + 2.5;
             } else {
-              reps = lastSet.reps + 1;
+              reps = lastSet.reps + 1 > end ? end : lastSet.reps + 1;
               weight = lastSet.weight;
             }
           } else {
@@ -210,7 +210,7 @@ const ProgressView = () => {
             <p>Nog geen eerdere progressie</p>
           )}
         </div>
-      )}
+      )} 
     </div>
   );
 }
