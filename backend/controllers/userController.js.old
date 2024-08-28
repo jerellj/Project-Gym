@@ -15,7 +15,7 @@ const generateToken = (user) => {
 
 // Registratie van een nieuwe gebruiker
 exports.registerUser = async (req, res) => {
-    const { name, email, password, role, notes, injury, weight, illness, goals } = req.body;
+    const { name, email, password, role, notities, blessures, gewicht, ziektes, doelen } = req.body;
     logger.info(`Registering user: ${name}, ${email}, ${role}`); // Log registratiepoging
     console.log('Request body:', req.body); // Log de request body
     try {
@@ -24,7 +24,7 @@ exports.registerUser = async (req, res) => {
 
         let customerDetails = null;
         if (role === 'klant') {
-            customerDetails = new CustomerDetails({ notes, injury, weight, illness, goals });
+            customerDetails = new CustomerDetails({ notities, blessures, gewicht, ziektes, doelen });
             await customerDetails.save();
         }
 
@@ -94,7 +94,7 @@ exports.getUsers = async (req, res) => {
 };
 
 // Haal een specifieke gebruiker op basis van e-mail en rol
-exports.getUserMail = async (req, res) => {
+exports.getUser = async (req, res) => {
     const { email } = req.query;
     try {
         const client = await User.findOne({ email, role: "klant" })
@@ -102,21 +102,6 @@ exports.getUserMail = async (req, res) => {
             .populate('customerDetails') // Populate CustomerDetails
             .populate('trainingPlans');
         logger.info(`Getting client with email: ${email}`);
-        res.status(200).json(client);
-    } catch (error) {
-        logger.error('Error getting clients:', error);
-        res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de klanten', error });
-    }
-};
-
-// Haal een specifieke gebruiker op basis ID
-exports.getUser = async (req, res) => {
-    const { userId } = req.params;
-    try {
-        const client = await User.findById(userId)
-            .select('-password')
-            .populate('customerDetails') // Populate CustomerDetails
-            .populate('trainingPlans');
         res.status(200).json(client);
     } catch (error) {
         logger.error('Error getting clients:', error);
@@ -153,6 +138,7 @@ exports.getUsersWithTrainingPlans = async (req, res) => {
     try {
         const clients = await User.find({ role: 'klant', trainingPlans: { $exists: true, $not: { $size: 0 } } })
             .select('-password')
+            .populate('customerDetails') // Populate CustomerDetails
             .populate({
                 path: 'trainingPlans',
                 populate: {
@@ -170,7 +156,7 @@ exports.getUsersWithTrainingPlans = async (req, res) => {
 // Update CustomerDetails voor een klant
 exports.updateCustomerDetails = async (req, res) => {
     const { userId } = req.params;
-    const { notes, injury, weight, illness, goals } = req.body;
+    const { notities, blessures, gewicht, ziektes, doelen } = req.body;
 
     try {
         const user = await User.findById(userId).populate('customerDetails');
@@ -180,46 +166,23 @@ exports.updateCustomerDetails = async (req, res) => {
 
         if (user.customerDetails) {
             // Update bestaande klantgegevens
-            const customerDetails = await CustomerDetails.findById(user.customerDetails._id);
-            customerDetails.notes = notes;
-            customerDetails.injury = injury;
-            customerDetails.weight = weight;
-            customerDetails.illness = illness;
-            customerDetails.goals = goals;
-            await customerDetails.save();
+            user.customerDetails.notities = notities;
+            user.customerDetails.blessures = blessures;
+            user.customerDetails.gewicht = gewicht;
+            user.customerDetails.ziektes = ziektes;
+            user.customerDetails.doelen = doelen;
+            await user.customerDetails.save();
         } else {
             // Maak nieuwe klantgegevens aan als deze nog niet bestaan
-            const customerDetails = new CustomerDetails({ notes, injury, weight, illness, goals });
+            const customerDetails = new CustomerDetails({ notities, blessures, gewicht, ziektes, doelen });
             await customerDetails.save();
             user.customerDetails = customerDetails._id;
             await user.save();
         }
 
-        const updatedUser = await User.findById(userId).populate('customerDetails');
-        res.status(200).json({ message: 'Klantdetails succesvol bijgewerkt', customerDetails: updatedUser.customerDetails });
+        res.status(200).json({ message: 'Klantdetails succesvol bijgewerkt', customerDetails: user.customerDetails });
     } catch (error) {
-        console.error('Error updating customer details:', error);
+        logger.error('Error updating klant details:', error);
         res.status(500).json({ message: 'Er is iets misgegaan bij het bijwerken van de klantdetails', error });
-    }
-};
-
-// Haal CustomerDetails op voor een specifieke gebruiker
-exports.getCustomerDetails = async (req, res) => {
-    const { userId } = req.params;
-
-    try {
-        const user = await User.findById(userId).populate('customerDetails');
-        if (!user || user.role !== 'klant') {
-            return res.status(404).json({ message: 'Klant niet gevonden' });
-        }
-
-        if (!user.customerDetails) {
-            return res.status(404).json({ message: 'CustomerDetails niet gevonden voor deze klant' });
-        }
-
-        res.status(200).json(user.customerDetails);
-    } catch (error) {
-        console.error('Error getting customer details:', error);
-        res.status(500).json({ message: 'Er is iets misgegaan bij het ophalen van de klantgegevens', error });
     }
 };

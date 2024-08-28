@@ -5,18 +5,9 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     role: { type: String, enum: ['trainer', 'klant'], required: true },
-    trainingPlans: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TrainingPlan' }]
+    trainingPlans: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TrainingPlan' }],
+    customerDetails: { type: mongoose.Schema.Types.ObjectId, ref: 'CustomerDetails' } 
 });
 
 const User = mongoose.model('User', UserSchema);
 module.exports = User;
-
-/*
-
-Notities
-Blesures
-Gewicht
-Ziektes
-Doelen
-
-*/

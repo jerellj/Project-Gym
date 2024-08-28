@@ -149,13 +149,29 @@ const UserList = () => {
     label: user.name
   }));
 
+  const customStyles = {
+    control: (provided) => ({
+      ...provided,
+      minWidth: '200px',
+      maxWidth: '300px',
+    }),
+    menu: (provided) => ({
+      ...provided,
+      width: '200px',
+    }),
+    option: (provided) => ({
+      ...provided,
+      padding: '5px 10px',
+    }),
+  };
+
   return (
     <div className="user-list-container">
       <h2 className="title">Create New User or Select User</h2>
       <button className="toggle-button" onClick={() => setShowCreateUserForm(!showCreateUserForm)}>
         {showCreateUserForm ? 'Cancel' : 'Create New User'}
       </button>
-
+  
       {showCreateUserForm ? (
         <form onSubmit={handleCreateUser} className="create-user-form">
           <div className="form-group">
@@ -188,44 +204,19 @@ const UserList = () => {
             onChange={handleUserChange}
             isClearable
             placeholder="Type to search..."
+            styles={customStyles}
           />
         </div>
       )}
-
+  
       {selectedUser && (
         <div className="user-details">
           <h3>User: {selectedUser.name}</h3>
 
           <div className="card">
             <h4>Basic Information</h4>
-            {isEditing ? (
-              <>
-                <div className="form-group">
-                  <label>Name:</label>
-                  <input
-                    type="text"
-                    value={selectedUser.name}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Email:</label>
-                  <input
-                    type="email"
-                    value={selectedUser.email}
-                    onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })}
-                    required
-                  />
-                </div>
-                <button onClick={handleCustomerDetailsSave} className="submit-button">Save Basic Information</button>
-              </>
-            ) : (
-              <>
-                <p><strong>Name:</strong> {selectedUser.name}</p>
-                <p><strong>Email:</strong> {selectedUser.email}</p>
-              </>
-            )}
+            <p><strong>Name:</strong> {selectedUser.name}</p>
+            <p><strong>Email:</strong> {selectedUser.email}</p>
           </div>
 
           {selectedUser.role === 'klant' && (
