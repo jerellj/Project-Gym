@@ -17,17 +17,21 @@ const NavBar = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const closeMenu = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-logo">MyLogo</div>
       <div className={`navbar-menu ${isMenuOpen ? 'open' : ''}`}>
-        <Link to="/">Search Exercises</Link>
-        <Link to="/training-plans">Training Plans</Link>
-        <Link to="/add-training-plan">Add Training Plan</Link>
-        <Link to="/add-training-session">Add Training Session</Link>
-        <Link to="/track-progress">Track Progress</Link>
-        <Link to="/list-trainingsessions">List Sessions</Link>
-        <Link to="/user">Users</Link>
+        <Link to="/" onClick={closeMenu}>Search Exercises</Link>
+        <Link to="/training-plans" onClick={closeMenu}>Training Plans</Link>
+        <Link to="/add-training-plan" onClick={closeMenu}>Add Training Plan</Link>
+        <Link to="/add-training-session" onClick={closeMenu}>Add Training Session</Link>
+        <Link to="/track-progress" onClick={closeMenu}>Track Progress</Link>
+        <Link to="/list-trainingsessions" onClick={closeMenu}>List Sessions</Link>
+        <Link to="/user" onClick={closeMenu}>Users</Link>
       </div>
       <div className="navbar-toggle" onClick={toggleMenu}>
         <span className="bar"></span>
@@ -36,7 +40,7 @@ const NavBar = () => {
       </div>
     </nav>
   );
-};
+}
 
 function App() {
   return (
